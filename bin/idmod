@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+if [ $# -lt 2 ]; then
+    echo "usage: idmod username new_uid [new_gid]"
+    exit 1
+fi
+
+username="$1"
+old_uid=$(id -u "$username")
+old_gid=$(id -g "$username")
+new_uid="$2"
+new_gid="$3"
+
+if [ -n "$new_uid" ] && [ "$old_uid" != "$new_uid" ]; then
+    if [ ! -z $(getent passwd | egrep -i ":$new_uid:") ]; then
+        echo "UID is already in use."
+    else
+        echo "Changing $username UID from $old_uid to $new_uid."
+        usermod -u "$new_uid" "$username"
+        find / -user "$old_uid" -exec chown -h "$username" {} 2>/dev/null \;
+    fi
+fi
+
+if [ -n "$new_gid" ] && [ "$old_gid" != "$new_gid" ]; then
+    if [ ! -z $(getent group | egrep -i ":$new_gid:") ]; then
+        echo "GID is already in use."
+    else
+        echo "Changing $username GID from $old_gid to $new_gid."
+        groupmod -g "$new_gid" "$username"
+        find / -group "$old_gid" -exec chgrp -h "$username" {} 2>/dev/null \;
+    fi
+fi
