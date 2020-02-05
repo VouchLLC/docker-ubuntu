@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV DOCKERIZE_VERSION "v0.6.1"
-ENV GOSU_VERSION "1.10"
+ENV GOSU_VERSION "1.11"
 ENV SHELL /bin/bash
 ENV TINI_VERSION "v0.18.0"
 
@@ -13,18 +13,20 @@ RUN apt-get dist-upgrade --assume-yes
 RUN apt-get install --assume-yes --no-install-recommends --no-install-suggests \
     apt-transport-https \
     apt-utils \
+    build-essential \
     ca-certificates \
     curl \
     git \
     gnupg2 \
     groff \
     language-pack-en \
-    python \
-    python-pip \
+    python3 \
+    python3-pip \
     ssh \
     sudo \
     tmux \
     unzip \
+    vim \
     zip
 
 RUN update-locale
@@ -37,11 +39,12 @@ RUN apt-get purge --assume-yes --auto-remove \
     --option APT::AutoRemove::RecommendsImportant=false \
     --option APT::AutoRemove::SuggestsImportant=false
 RUN rm -rf /var/lib/apt/lists/*
-
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 ENV PYTHONIOENCODING=UTF-8
 
-RUN pip install --upgrade pip==9.0.3
+RUN pip install -U pip 
 RUN pip install setuptools
 RUN pip install awscli
 
